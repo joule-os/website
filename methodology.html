@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology — Joule</title>
+<meta name="description" content="How Joule measures the value of AI datacenter flexibility: data sources, dispatch model, and reproducible results.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230A0A0B'/%3E%3Ctext x='32' y='45' font-family='monospace' font-size='38' font-weight='bold' fill='%23C9FE6E' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0B;--ink:#F4F4F2;--ink-60:rgba(244,244,242,.6);--ink-38:rgba(244,244,242,.38);
+  --signal:#C9FE6E;--line:rgba(244,244,242,.09);--anthracite:#161617;
+  --sans:'Space Grotesk',sans-serif;--mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;font-size:16.5px;line-height:1.7;min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--signal);color:#0A0A0B}
+body::after{content:"";position:fixed;inset:0;z-index:60;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity:.16;mix-blend-mode:overlay}
+.gridlines{position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;justify-content:space-between;padding:0 4vw}
+.gridlines i{display:block;width:1px;height:100%;background:var(--line)}
+@media (max-width:900px){.gridlines i:nth-child(n+6){display:none}}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 4vw}
+header{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(12px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line)}
+nav{max-width:1360px;margin:0 auto;padding:0 4vw;height:64px;display:flex;align-items:center;justify-content:space-between}
+.wordmark{font-weight:700;font-size:20px;letter-spacing:.14em;color:var(--ink);text-decoration:none}
+.wordmark em{font-style:normal;color:var(--signal)}
+.back{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-60);text-decoration:none;transition:color .2s}
+.back:hover{color:var(--signal)}
+a:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
+.doc{padding:160px 0 100px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--signal);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+.kicker::before{content:"";width:34px;height:1px;background:var(--signal)}
+h1{font-weight:700;text-transform:uppercase;letter-spacing:-.02em;line-height:1;font-size:clamp(38px,6vw,72px);margin-bottom:20px}
+.lede{color:var(--ink-60);font-size:18px;max-width:60ch;margin-bottom:24px}
+.meta{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-38);padding:16px 0 56px;border-bottom:1px solid var(--line);margin-bottom:64px}
+h2{font-weight:500;font-size:clamp(22px,2.6vw,30px);text-transform:uppercase;letter-spacing:-.01em;margin:64px 0 24px;padding-top:32px;border-top:1px solid var(--line)}
+h2 .no{font-family:var(--mono);font-size:12px;color:var(--signal);letter-spacing:.16em;display:block;margin-bottom:12px;font-weight:400}
+p{color:var(--ink-60);max-width:68ch;margin-bottom:18px}
+p b,li b{color:var(--ink);font-weight:500}
+table{width:100%;border-collapse:collapse;margin:28px 0 36px;font-size:14.5px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-38);text-align:left;padding:12px 16px 12px 0;border-bottom:1px solid var(--line);font-weight:400}
+td{padding:14px 16px 14px 0;border-bottom:1px solid var(--line);color:var(--ink-60);vertical-align:top}
+td:first-child{color:var(--ink)}
+td .sig{color:var(--signal)}
+code{font-family:var(--mono);font-size:.88em;color:var(--signal);background:var(--anthracite);padding:2px 7px;border-radius:4px}
+ul{margin:0 0 18px 0;list-style:none}
+li{color:var(--ink-60);padding:8px 0 8px 22px;position:relative;max-width:66ch}
+li::before{content:"—";position:absolute;left:0;color:var(--signal)}
+.formula{font-family:var(--mono);font-size:13.5px;color:var(--ink);background:var(--anthracite);border:1px solid var(--line);border-radius:8px;padding:20px 24px;margin:24px 0 32px;overflow-x:auto;line-height:1.9}
+.callout{border-left:2px solid var(--signal);padding:4px 0 4px 22px;margin:28px 0;color:var(--ink);font-size:16px;max-width:62ch}
+footer{border-top:1px solid var(--line);padding:40px 0;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-38);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+footer a{color:var(--ink-60);text-decoration:none}
+footer a:hover{color:var(--signal)}
+@media (max-width:700px){.doc{padding:130px 0 70px}th,td{padding-right:14px;font-size:13px}table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}}
+</style>
+</head>
+<body>
+<div class="gridlines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<header><nav>
+  <a class="wordmark" href="index.html">JOU<em>LE</em></a>
+  <a class="back" href="index.html">← Back</a>
+</nav></header>
+
+<main class="wrap"><article class="doc">
+  <p class="kicker">Methodology — v0.1</p>
+  <h1>How we measure a megawatt.</h1>
+  <p class="lede">Every figure Joule publishes comes from public market data and a reproducible model. This page is the complete method — so your team can check our numbers before you ever talk to us.</p>
+  <p class="meta">Data window: Jun 2025 – Oct 2026 · Sources: EPEX / SEMOpx / regelleistung.net / SEM Committee · Status: living document</p>
+
+  <h2><span class="no">M—01</span>Reference site</h2>
+  <p>All figures refer to a standardized <b>10 MW AI datacenter</b> (IT capacity, meter side scaled by PUE 1.25):</p>
+  <table>
+    <tr><th>Load class</th><th>IT capacity</th><th>Utilization</th><th>Flexibility</th></tr>
+    <tr><td>Inference — tier 1 (real-time)</td><td>4.75 MW</td><td>diurnal profile</td><td>none</td></tr>
+    <tr><td>Inference — tier 2 (async / batch)</td><td>0.25 MW</td><td>diurnal</td><td>minutes-scale</td></tr>
+    <tr><td>Training</td><td>4.0 MW</td><td>75% target</td><td><span class="sig">hours-to-days deferrable</span></td></tr>
+    <tr><td>Base (cooling, network, storage)</td><td>1.0 MW</td><td>constant</td><td>none</td></tr>
+  </table>
+  <p>Training energy is conserved: <b>72 MWh per day</b> must be delivered within each 24-hour window — flexibility means <i>when</i>, never <i>whether</i>.</p>
+
+  <h2><span class="no">M—02</span>Data sources</h2>
+  <ul>
+    <li><b>Day-ahead spot prices</b> — EPEX (DE-LU, FR) via the public energy-charts.info API; SEMOpx for the Irish SEM. Uniform hourly resolution throughout.</li>
+    <li><b>Ancillary capacity prices</b> — regelleistung.net (German TSO joint platform), twelve months of weekly tenders, FCR and aFRR.</li>
+    <li><b>Capacity market parameters</b> — SEM Committee auction information packs and decision papers (CRM T-4 2028/29, 2029/30).</li>
+  </ul>
+
+  <h2><span class="no">M—03</span>Dispatch model</h2>
+  <p>Two scheduling strategies compete on identical data:</p>
+  <div class="formula">oracle:&nbsp;&nbsp;fill each day's 72 MWh of training into that day's cheapest hours (water-filling) — the theoretical upper bound<br>naive:&nbsp;&nbsp;&nbsp;fill the fixed night window 22:00–06:00 first — the heuristic operators actually use</div>
+  <p>Capture rate = realized savings ÷ oracle savings, against a flat-schedule baseline. All accounting is energy-conserving at uniform hourly resolution.</p>
+
+  <h2><span class="no">M—04</span>Results</h2>
+  <table>
+    <tr><th>Market</th><th>Oracle savings / yr</th><th>Share of power bill</th><th>Naive capture</th></tr>
+    <tr><td>Ireland (SEM)</td><td>€815k</td><td>9.6%</td><td>~33%¹</td></tr>
+    <tr><td>Germany (DE-LU)</td><td>€938k – €1.12M</td><td>12–14%</td><td>~51%</td></tr>
+    <tr><td>France (FR)</td><td>€740k – €0.99M</td><td>15–17%</td><td>~46%</td></tr>
+  </table>
+  <p>The naive baseline's annual figure conceals a structural split: it captures <b>85–97% in winter</b> (wind makes nights cheap) but only <b>20–35% in summer</b> (solar makes midday cheap). The optimizer's edge concentrates exactly where value is most volatile.</p>
+  <div class="callout">Ancillary and capacity layers — FCR at a measured €141.9k/MW/yr, aFRR at €50.7k/MW/yr, Irish CRM clearing at €135.5k/MW/yr — are inaccessible to any fixed-schedule strategy. Naive capture there is not 50%. It is zero.</div>
+  <p>Stacking the dispatchable share of these layers on top of arbitrage brings the total annual value pool for the reference site to <b>≈ €1.0–1.4M</b>, depending on market and registered flexible capacity (3.6 MW of 10 MW in this configuration). Site-specific figures are computed, not extrapolated, in every audit.</p>
+
+  <h2><span class="no">M—05</span>Limitations</h2>
+  <ul>
+    <li>Oracle is an upper bound; production systems are gated at <b>≥60% capture</b>.</li>
+    <li>Hourly resolution understates intraday optionality; telemetry-grade modeling ships with audits.</li>
+    <li>Irish spot series ends May 2026 pending ENTSO-E access; figures marked ¹ reflect that window.</li>
+    <li>No storage assumed. Storage-backed configurations unlock FCR symmetry and are assessed per site.</li>
+  </ul>
+  <p style="margin-top:40px">Questions, replication attempts, disputes: <a href="mailto:hello@joule-os.com" style="color:var(--signal);text-decoration:none">hello@joule-os.com</a>. We answer all three.</p>
+</article>
+
+<footer>
+  <span>Joule — a product of Effiq Inc.</span>
+  <a href="index.html">joule-os.com</a>
+</footer>
+</main>
+</body>
+</html>

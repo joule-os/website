@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joule — Power, Negotiated. Flexibility OS for AI Factories</title>
+<meta name="description" content="Joule turns AI datacenter load into certified, dispatchable flexibility — so the grid pays you, connects you faster, and never touches your SLA.">
+<meta property="og:title" content="Joule — Power, Negotiated.">
+<meta property="og:description" content="Flexibility OS for AI factories. Measured on real European market data, not slideware.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://joule-os.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230A0A0B'/%3E%3Ctext x='32' y='45' font-family='monospace' font-size='38' font-weight='bold' fill='%23C9FE6E' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0B;
+  --ink:#F4F4F2;
+  --ink-60:rgba(244,244,242,.6);
+  --ink-38:rgba(244,244,242,.38);
+  --signal:#C9FE6E;
+  --signal-dim:rgba(201,254,110,.14);
+  --line:rgba(244,244,242,.09);
+  --anthracite:#161617;
+  --sans:'Space Grotesk',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-weight:300;
+  font-size:17px;line-height:1.65;
+  min-height:100dvh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--signal);color:#0A0A0B}
+
+/* grain overlay */
+body::after{
+  content:"";position:fixed;inset:0;z-index:60;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity:.16;mix-blend-mode:overlay;
+}
+
+/* persistent grid overlay with travelling traces */
+.gridlines{position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;justify-content:space-between;padding:0 4vw}
+.gridlines i{display:block;width:1px;height:100%;background:var(--line);position:relative;overflow:visible}
+.gridlines i::after{
+  content:"";position:absolute;left:-1px;width:3px;height:120px;
+  background:linear-gradient(180deg,transparent,var(--signal),transparent);
+  opacity:0;animation:trace 9s linear infinite;
+}
+.gridlines i:nth-child(2)::after{animation-delay:1.7s;animation-duration:11s}
+.gridlines i:nth-child(3)::after{animation-delay:4.2s;animation-duration:8s}
+.gridlines i:nth-child(4)::after{animation-delay:2.6s;animation-duration:12s}
+.gridlines i:nth-child(5)::after{animation-delay:6.1s;animation-duration:9.5s}
+.gridlines i:nth-child(6)::after{animation-delay:0.8s;animation-duration:10.5s}
+.gridlines i:nth-child(7)::after{animation-delay:5s;animation-duration:8.6s}
+.gridlines i:nth-child(8)::after{animation-delay:3.3s;animation-duration:11.4s}
+.gridlines i:nth-child(9)::after{animation-delay:7.4s;animation-duration:9s}
+@keyframes trace{0%{top:-15%;opacity:0}12%{opacity:.5}88%{opacity:.5}100%{top:110%;opacity:0}}
+@media (prefers-reduced-motion:reduce){.gridlines i::after{animation:none;opacity:0}}
+
+.wrap{position:relative;z-index:1;max-width:1360px;margin:0 auto;padding:0 4vw}
+
+/* nav */
+header{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(12px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line)}
+nav{max-width:1360px;margin:0 auto;padding:0 4vw;height:64px;display:flex;align-items:center;justify-content:space-between}
+.wordmark{font-family:var(--sans);font-weight:700;font-size:20px;letter-spacing:.14em;color:var(--ink);text-decoration:none}
+.wordmark em{font-style:normal;color:var(--signal)}
+.nav-links{display:flex;gap:34px;align-items:center}
+.nav-links a{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-60);text-decoration:none;position:relative;padding:6px 0;transition:color .2s}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:var(--signal);transform:scaleX(0);transform-origin:right;transition:transform .28s ease}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+a:focus-visible,button:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
+
+/* roll-text pill button */
+.btn{display:inline-flex;align-items:center;gap:14px;text-decoration:none;cursor:pointer;
+  font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--signal);color:#0A0A0B;border:1px solid var(--signal);
+  height:50px;padding:0 26px;border-radius:500px;font-weight:500;transition:background .22s,color .22s}
+.btn .roll{display:inline-block;height:1.3em;overflow:hidden}
+.btn .roll span{display:block;line-height:1.3em;white-space:nowrap;transition:transform .38s cubic-bezier(.16,.03,.08,1)}
+.nav-links a.btn{color:#0A0A0B}
+.nav-links a.btn::after{display:none}
+.btn:hover .roll span{transform:translateY(-1.3em)}
+.btn .arr{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#0A0A0B;flex:none}
+.btn .arr svg{display:block}
+.btn.ghost{background:transparent;color:var(--ink);border-color:rgba(244,244,242,.25)}
+.btn.ghost .arr{background:var(--signal)}
+.btn.ghost:hover{border-color:var(--signal)}
+.btn.sm{height:40px;padding:0 18px;font-size:11px}
+.btn.sm .arr{width:20px;height:20px}
+@media (prefers-reduced-motion:reduce){.btn .roll span{transition:none}.btn:hover .roll span{transform:none}}
+
+/* hero */
+.hero{min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 0 56px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--signal);margin-bottom:28px;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--signal)}
+h1{font-weight:700;text-transform:uppercase;letter-spacing:-.02em;line-height:.92;
+  font-size:clamp(52px,11.5vw,168px);margin-bottom:34px}
+h1 .l2{color:var(--signal)}
+.hero-sub{max-width:62ch;color:var(--ink-60);font-size:clamp(16px,1.4vw,19px);margin-bottom:44px}
+.hero-cta{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.hero-meta{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+  display:flex;gap:48px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-38)}
+
+/* marquee */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:18px 0;background:var(--bg)}
+.marquee-track{display:flex;gap:56px;width:max-content;animation:mq 34s linear infinite;white-space:nowrap}
+.marquee span{font-family:var(--mono);font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-38)}
+.marquee b{color:var(--signal);font-weight:400}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.marquee-track{animation:none}}
+
+/* sections */
+section{padding:120px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:minmax(140px,220px) 1fr;gap:32px;margin-bottom:72px}
+.sec-label{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--signal);padding-top:14px}
+h2{font-weight:500;font-size:clamp(30px,3.6vw,52px);line-height:1.08;letter-spacing:-.015em;text-transform:uppercase;max-width:20ch}
+h2 em{font-style:normal;color:var(--signal)}
+
+/* problem */
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+.fact{padding:36px 32px 40px;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.fact:last-child{border-right:none}
+.fact .k{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-38);margin-bottom:20px}
+.fact .v{font-size:clamp(38px,3.4vw,54px);font-weight:700;letter-spacing:-.02em;line-height:1;margin-bottom:16px}
+.fact .v i{font-style:normal;color:var(--signal)}
+.fact p{color:var(--ink-60);font-size:15px;max-width:34ch}
+
+/* system layers */
+.layers{border-top:1px solid var(--line)}
+.layer{display:grid;grid-template-columns:minmax(80px,140px) 1fr 1.2fr;gap:32px;padding:44px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.layer .no{font-family:var(--mono);font-size:12px;color:var(--ink-38);letter-spacing:.16em}
+.layer h3{font-size:clamp(24px,2.4vw,36px);font-weight:500;text-transform:uppercase;letter-spacing:-.01em}
+.layer p{color:var(--ink-60);font-size:15.5px;max-width:52ch}
+.layer .tags{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+.layer .tags span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--signal);border:1px solid rgba(201,254,110,.3);padding:5px 10px;border-radius:500px}
+
+/* numbers */
+.numbers{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
+.num{padding:40px 32px;border-bottom:1px solid var(--line)}
+.num:nth-child(odd){border-right:1px solid var(--line)}
+.num .v{font-size:clamp(40px,4vw,64px);font-weight:700;letter-spacing:-.02em;line-height:1;margin-bottom:14px}
+.num .v i{font-style:normal;color:var(--signal)}
+.num .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);max-width:44ch;line-height:1.7}
+.note{margin-top:28px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-38);line-height:1.8;max-width:78ch}
+
+/* neutrality */
+.neutral{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start}
+.neutral p{color:var(--ink-60);font-size:17px;max-width:52ch}
+.neutral p+p{margin-top:18px}
+.checklist{list-style:none;border-top:1px solid var(--line)}
+.checklist li{display:flex;gap:16px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+.checklist li::before{content:"—";color:var(--signal);flex:none}
+
+/* cta */
+.cta{padding:140px 0;text-align:left}
+.cta h2{font-size:clamp(36px,5vw,72px);max-width:16ch;margin-bottom:28px}
+.cta p{color:var(--ink-60);max-width:56ch;margin-bottom:44px}
+
+footer{padding:64px 0 40px}
+.foot-mark{font-weight:700;font-size:clamp(72px,16vw,240px);letter-spacing:-.02em;line-height:.9;text-transform:uppercase;color:var(--anthracite);-webkit-text-stroke:1px rgba(244,244,242,.14);user-select:none;margin-bottom:44px}
+.foot-row{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-38)}
+.foot-row a{color:var(--ink-60);text-decoration:none}
+.foot-row a:hover{color:var(--signal)}
+
+/* reveal on scroll */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rv.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+@media (max-width:900px){
+  .nav-links a:not(.btn){display:none}
+  .sec-head{grid-template-columns:1fr;gap:14px;margin-bottom:48px}
+  .facts{grid-template-columns:1fr}
+  .fact{border-right:none}
+  .layer{grid-template-columns:1fr;gap:12px;padding:36px 0}
+  .numbers{grid-template-columns:1fr}
+  .num:nth-child(odd){border-right:none}
+  .neutral{grid-template-columns:1fr;gap:40px}
+  section{padding:84px 0}
+  .gridlines i:nth-child(n+6){display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="gridlines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<header>
+  <nav>
+    <a class="wordmark" href="#top">JOU<em>LE</em></a>
+    <div class="nav-links">
+      <a href="#problem">The Shift</a>
+      <a href="#system">System</a>
+      <a href="#numbers">Numbers</a>
+      <a href="#neutrality">Neutrality</a>
+      <a class="btn sm" href="mailto:hello@joule-os.com"><span class="roll"><span>Request audit<br>Request audit</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#C9FE6E" stroke-width="1.4"/></svg></span></a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+<div class="wrap">
+
+  <section class="hero" style="border-bottom:none">
+    <p class="eyebrow">Flexibility OS for AI factories — Europe</p>
+    <h1>Power,<br><span class="l2">negotiated.</span></h1>
+    <p class="hero-sub">AI datacenters are the largest new loads on Europe's grids. Joule turns compute into certified, dispatchable flexibility — so the grid pays you, connects you faster, and never touches your SLA.</p>
+    <div class="hero-cta">
+      <a class="btn" href="mailto:hello@joule-os.com?subject=Flexibility%20audit%20request"><span class="roll"><span>Request a flexibility audit<br>Request a flexibility audit</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#C9FE6E" stroke-width="1.4"/></svg></span></a>
+      <a class="btn ghost" href="#numbers"><span class="roll"><span>See the numbers<br>See the numbers</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#0A0A0B" stroke-width="1.4"/></svg></span></a>
+    </div>
+    <div class="hero-meta">
+      <span>Ireland · Germany · France</span>
+      <span>Backtested on real market data</span>
+      <span>Vendor-neutral</span>
+    </div>
+  </section>
+
+</div>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="mq">
+    <span>Demand response <b>·</b> Capacity markets <b>·</b> FCR <b>·</b> aFRR <b>·</b> Settlement-grade evidence <b>·</b> Grid compliance <b>·</b> Dispatchable load <b>·</b> Revenue stacking <b>·</b></span>
+    <span>Demand response <b>·</b> Capacity markets <b>·</b> FCR <b>·</b> aFRR <b>·</b> Settlement-grade evidence <b>·</b> Grid compliance <b>·</b> Dispatchable load <b>·</b></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section id="problem">
+    <div class="sec-head rv">
+      <p class="sec-label">01 / The shift</p>
+      <h2>The grid just <em>changed the terms.</em></h2>
+    </div>
+    <div class="facts">
+      <div class="fact rv">
+        <p class="k">Ireland · CRU 2025/236</p>
+        <p class="v">≥<i>10 MVA</i></p>
+        <p>New datacenters must now bring dispatchable generation or storage matching 100% of import capacity — plus 80% Irish renewables — or be refused connection.</p>
+      </div>
+      <div class="fact rv">
+        <p class="k">Europe · IEA</p>
+        <p class="v">~<i>20%</i></p>
+        <p>Of planned datacenter projects face delays from grid bottlenecks. Connection queues are now measured in years.</p>
+      </div>
+      <div class="fact rv">
+        <p class="k">Meanwhile</p>
+        <p class="v">€<i>135.5k</i></p>
+        <p>Per MW per year — the latest Irish T-4 capacity auction clearing price. Grids pay serious money for flexibility they can certify.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="system">
+    <div class="sec-head rv">
+      <p class="sec-label">02 / System</p>
+      <h2>One layer between your cluster <em>and the market.</em></h2>
+    </div>
+    <div class="layers">
+      <div class="layer rv">
+        <p class="no">L—01</p>
+        <h3>Dispatch</h3>
+        <div>
+          <p>SLA-safe load shaping. Deferrable training shifts across hours; inference power shapes within seconds. Every action bounded by your service tiers, not ours.</p>
+          <div class="tags"><span>Sub-minute response</span><span>Fail-safe pass-through</span></div>
+        </div>
+      </div>
+      <div class="layer rv">
+        <p class="no">L—02</p>
+        <h3>Markets</h3>
+        <div>
+          <p>Day-ahead and intraday arbitrage, capacity auctions, frequency response — stacked per market, per rulebook, per country. Twenty-seven European markets are twenty-seven different games. We play all of them.</p>
+          <div class="tags"><span>CRM / DSU</span><span>FCR / aFRR</span><span>EPEX / SEM</span></div>
+        </div>
+      </div>
+      <div class="layer rv">
+        <p class="no">L—03</p>
+        <h3>Evidence</h3>
+        <div>
+          <p>Settlement-grade telemetry at 15-second resolution with an immutable audit trail. Built to survive grid-code testing, performance monitoring, and disputes — because flexibility you cannot prove is flexibility you do not get paid for.</p>
+          <div class="tags"><span>15s telemetry</span><span>PME &lt; 0.25 MWh</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="numbers">
+    <div class="sec-head rv">
+      <p class="sec-label">03 / Numbers</p>
+      <h2>Measured on real prices, <em>not slideware.</em></h2>
+    </div>
+    <div class="numbers">
+      <div class="num rv">
+        <p class="v">€<i>1.0–1.4M</i></p>
+        <p class="k">Annual value pool for a reference 10 MW AI site — backtested against twelve months of real market prices in Ireland, Germany and France.</p>
+      </div>
+      <div class="num rv">
+        <p class="v">&lt;<i>60 s</i></p>
+        <p class="k">Dispatch response of software-defined load. The Irish grid code allows one hour. We consider that slow.</p>
+      </div>
+      <div class="num rv">
+        <p class="v"><i>15 s</i></p>
+        <p class="k">Telemetry resolution, continuous, per site — the settlement standard capacity markets actually demand.</p>
+      </div>
+      <div class="num rv">
+        <p class="v">€<i>141.9k</i></p>
+        <p class="k">Per MW per year — measured average for FCR frequency response capacity in the German market over the past twelve months.</p>
+      </div>
+    </div>
+    <p class="note rv">Methodology: oracle backtests on day-ahead prices (EPEX, SEMOpx) and ancillary capacity prices (regelleistung.net), uniform hourly resolution, energy-conserving. <a href="methodology.html" style="color:var(--signal);text-decoration:none;border-bottom:1px solid rgba(201,254,110,.4)">Read the full methodology →</a></p>
+  </section>
+
+  <section id="neutrality">
+    <div class="sec-head rv">
+      <p class="sec-label">04 / Neutrality</p>
+      <h2>We work for the operator. <em>Only the operator.</em></h2>
+    </div>
+    <div class="neutral">
+      <div class="rv">
+        <p>Joule is not a chip vendor, not a cloud, and not tied to any hardware stack. Your grid relationship is a strategic asset — it should not come bundled with someone else's silicon roadmap.</p>
+        <p>Mixed fleets, sovereign AI factories, colocation operators: if your infrastructure answers to more than one vendor, you need a flexibility layer that answers to you.</p>
+      </div>
+      <ul class="checklist rv">
+        <li>Hardware-agnostic — GPU, TPU, mixed fleets</li>
+        <li>Your data stays on your premises</li>
+        <li>No revenue share with hardware vendors</li>
+        <li>Auditable down to the settlement record</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <h2 class="rv">What is a megawatt of your load <em>worth?</em></h2>
+    <p class="rv">Send us an anonymized load profile. We return a site-specific flexibility assessment — revenue pools by market, compliance gaps, and the full methodology, so your team can verify every number.</p>
+    <a class="btn rv" href="mailto:hello@joule-os.com?subject=Flexibility%20audit%20request"><span class="roll"><span>Request a flexibility audit<br>Request a flexibility audit</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#C9FE6E" stroke-width="1.4"/></svg></span></a>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-mark" aria-hidden="true">Joule</div>
+    <div class="foot-row">
+      <span>Joule — a product of Effiq Inc., Delaware, USA</span>
+      <span>Ireland · Germany · France</span>
+      <a href="mailto:hello@joule-os.com">hello@joule-os.com</a>
+    </div>
+  </div>
+</footer>
+</main>
+
+<script>
+// reveal on scroll
+const io = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}})},{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
