@@ -6,6 +6,7 @@
 <title>Methodology — Joule</title>
 <meta name="description" content="How Joule measures the value of AI datacenter flexibility: data sources, dispatch model, and reproducible results.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230A0A0B'/%3E%3Ctext x='32' y='45' font-family='monospace' font-size='38' font-weight='bold' fill='%23C9FE6E' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -68,10 +69,10 @@ footer a:hover{color:var(--signal)}
 </nav></header>
 
 <main class="wrap"><article class="doc">
-  <p class="kicker">Methodology — v0.1</p>
+  <p class="kicker">Methodology — v0.2</p>
   <h1>How we measure a megawatt.</h1>
   <p class="lede">Every figure Joule publishes comes from public market data and a reproducible model. This page is the complete method — so your team can check our numbers before you ever talk to us.</p>
-  <p class="meta">Data window: Jun 2025 – Oct 2026 · Sources: EPEX / SEMOpx / regelleistung.net / SEM Committee · Status: living document</p>
+  <p class="meta">Data window: Jun 2025 – May 2026 · Sources: EPEX / SEMOpx / regelleistung.net / SEM Committee · Status: living document</p>
 
   <h2><span class="no">M—01</span>Reference site</h2>
   <p>All figures refer to a standardized <b>10 MW AI datacenter</b> (IT capacity, meter side scaled by PUE 1.25):</p>
@@ -92,33 +93,34 @@ footer a:hover{color:var(--signal)}
   </ul>
 
   <h2><span class="no">M—03</span>Dispatch model</h2>
-  <p>Two scheduling strategies compete on identical data:</p>
-  <div class="formula">oracle:&nbsp;&nbsp;fill each day's 72 MWh of training into that day's cheapest hours (water-filling) — the theoretical upper bound<br>naive:&nbsp;&nbsp;&nbsp;fill the fixed night window 22:00–06:00 first — the heuristic operators actually use</div>
+  <p>Three scheduling strategies compete on identical data:</p>
+  <div class="formula">oracle:&nbsp;&nbsp;&nbsp;&nbsp;annual linear program over a 72 MWh (24 h) deferrable queue — the theoretical upper bound, computed with full hindsight<br>scheduler:&nbsp;Joule's production design — a rolling 48 h plan, frozen daily when day-ahead prices publish (~13:00); tomorrow runs on published prices, the day after on a 7-day persistence forecast. No future information.<br>naive:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fixed night window 22:00–10:00 at 6 MW — the heuristic operators actually use</div>
   <p>Capture rate = realized savings ÷ oracle savings, against a flat-schedule baseline. All accounting is energy-conserving at uniform hourly resolution.</p>
 
   <h2><span class="no">M—04</span>Results</h2>
   <table>
-    <tr><th>Market</th><th>Oracle savings / yr</th><th>Share of power bill</th><th>Naive capture</th></tr>
-    <tr><td>Ireland (SEM)</td><td>€815k</td><td>9.6%</td><td>~33%¹</td></tr>
-    <tr><td>Germany (DE-LU)</td><td>€938k – €1.12M</td><td>12–14%</td><td>~51%</td></tr>
-    <tr><td>France (FR)</td><td>€740k – €0.99M</td><td>15–17%</td><td>~46%</td></tr>
+    <tr><th>Market</th><th>Oracle ceiling / yr</th><th>Joule scheduler capture</th><th>Naive night-window capture</th></tr>
+    <tr><td>Ireland (SEM)</td><td>€783k</td><td><span class="sig">84.6%</span></td><td>+29.9%</td></tr>
+    <tr><td>Germany (DE-LU)</td><td>€855k</td><td><span class="sig">89.8%</span></td><td>−1.2%</td></tr>
+    <tr><td>France (FR)</td><td>€727k</td><td><span class="sig">87.0%</span></td><td>−6.0%</td></tr>
   </table>
-  <p>The naive baseline's annual figure conceals a structural split: it captures <b>85–97% in winter</b> (wind makes nights cheap) but only <b>20–35% in summer</b> (solar makes midday cheap). The optimizer's edge concentrates exactly where value is most volatile.</p>
-  <div class="callout">Ancillary and capacity layers — FCR at a measured €141.9k/MW/yr, aFRR at €50.7k/MW/yr, Irish CRM clearing at €135.5k/MW/yr — are inaccessible to any fixed-schedule strategy. Naive capture there is not 50%. It is zero.</div>
+  <p>The naive line is not a strawman — it is what a cron job does, and it has quietly become a cost center. Its figure is window-fragile by construction: in Germany it still captured <b>39–45%</b> in the wind season (Nov–Jan) but lost money in every solar month, down to <b>−33%</b> in April; France swings from <b>+29%</b> in January to <b>−37%</b> in April. Solar has inverted the daily price shape the fixed window was built on.</p>
+  <p>We publish the uncomfortable corollary too: a price-aware day-ahead baseline already captures most of the oracle. Arbitrage alone is not a moat — anyone with published prices can do it. Joule's margin lives where day-ahead scheduling cannot go: cross-day banking, ancillary and capacity stacking, sub-minute response, and settlement-grade evidence.</p>
+  <div class="callout">Ancillary and capacity layers — FCR at a measured €141.9k/MW/yr, aFRR at €50.7k/MW/yr, Irish CRM clearing at €135.5k/MW/yr — are inaccessible to any fixed-schedule strategy. Naive capture there is not low. It is zero.</div>
   <p>Stacking the dispatchable share of these layers on top of arbitrage brings the total annual value pool for the reference site to <b>≈ €1.0–1.4M</b>, depending on market and registered flexible capacity (3.6 MW of 10 MW in this configuration). Site-specific figures are computed, not extrapolated, in every audit.</p>
 
   <h2><span class="no">M—05</span>Limitations</h2>
   <ul>
-    <li>Oracle is an upper bound; production systems are gated at <b>≥60% capture</b>.</li>
+    <li>Oracle is an upper bound. Our production scheduler is gated at <b>≥60% capture</b>; the measured figures above cleared that gate in all three markets, with only day-ahead information.</li>
     <li>Hourly resolution understates intraday optionality; telemetry-grade modeling ships with audits.</li>
-    <li>Irish spot series ends May 2026 pending ENTSO-E access; figures marked ¹ reflect that window.</li>
+    <li>The window closes May 2026; extending it forward is pending ENTSO-E transparency-platform access.</li>
     <li>No storage assumed. Storage-backed configurations unlock FCR symmetry and are assessed per site.</li>
   </ul>
   <p style="margin-top:40px">Questions, replication attempts, disputes: <a href="mailto:hello@joule-os.com" style="color:var(--signal);text-decoration:none">hello@joule-os.com</a>. We answer all three.</p>
 </article>
 
 <footer>
-  <span>Joule — a product of Effiq Inc.</span>
+  <span>Joule — a product of Effiq Technologies, Inc.</span>
   <a href="index.html">joule-os.com</a>
 </footer>
 </main>
