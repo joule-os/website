@@ -69,10 +69,10 @@ footer a:hover{color:var(--signal)}
 </nav></header>
 
 <main class="wrap"><article class="doc">
-  <p class="kicker">Methodology — v0.2</p>
+  <p class="kicker">Methodology — v0.2.1</p>
   <h1>How we measure a megawatt.</h1>
   <p class="lede">Every figure Joule publishes comes from public market data and a reproducible model. This page is the complete method — so your team can check our numbers before you ever talk to us.</p>
-  <p class="meta">Data window: Jun 2025 – May 2026 · Sources: EPEX / SEMOpx / regelleistung.net / SEM Committee · Status: living document</p>
+  <p class="meta">Data window: Jun 2025 – May 2026 · Sources: ENTSO-E Transparency Platform / SEMOpx / EPEX / regelleistung.net / SEM Committee · Status: living document — re-verified against official publication 7 Nov 2026</p>
 
   <h2><span class="no">M—01</span>Reference site</h2>
   <p>All figures refer to a standardized <b>10 MW AI datacenter</b> (IT capacity, meter side scaled by PUE 1.25):</p>
@@ -100,10 +100,11 @@ footer a:hover{color:var(--signal)}
   <h2><span class="no">M—04</span>Results</h2>
   <table>
     <tr><th>Market</th><th>Oracle ceiling / yr</th><th>Joule scheduler capture</th><th>Naive night-window capture</th></tr>
-    <tr><td>Ireland (SEM)</td><td>€783k</td><td><span class="sig">84.6%</span></td><td>+29.9%</td></tr>
-    <tr><td>Germany (DE-LU)</td><td>€855k</td><td><span class="sig">89.8%</span></td><td>−1.2%</td></tr>
-    <tr><td>France (FR)</td><td>€727k</td><td><span class="sig">87.0%</span></td><td>−6.0%</td></tr>
+    <tr><td>Ireland (SEM)</td><td>€783k</td><td><span class="sig">84.3%</span></td><td>+29.9%</td></tr>
+    <tr><td>Germany (DE-LU)</td><td>€806k</td><td><span class="sig">88.9%</span></td><td>−1.2%</td></tr>
+    <tr><td>France (FR)</td><td>€663k</td><td><span class="sig">85.9%</span></td><td>−6.0%</td></tr>
   </table>
+  <p class="note" style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-38);margin:-18px 0 28px">Data vintage: scheduler-capture and oracle columns re-verified 7 Nov 2026 against the ENTSO-E Transparency Platform's canonical publication (position-1 series; 15-minute MTUs aggregated to hourly means after each market's switch). An earlier vintage of this table — IE 84.6%, DE 89.8%, FR 87.0% capture; DE €855k, FR €727k oracle, computed on exchange-mirror data — is the basis of our CRU2026143 submission (ref. CRU-C108-2). The differences (−0.3pp IE, −0.9pp DE, −1.1pp FR) reflect mirror-vs-canonical publication conventions and one official placeholder hour; the naive baseline is shown on its original data vintage. No conclusion changes; all three markets still clear our ≥60% acceptance gate.</p>
   <p>The naive line is not a strawman — it is what a cron job does, and it has quietly become a cost center. Its figure is window-fragile by construction: in Germany it still captured <b>39–45%</b> in the wind season (Nov–Jan) but lost money in every solar month, down to <b>−33%</b> in April; France swings from <b>+29%</b> in January to <b>−37%</b> in April. Solar has inverted the daily price shape the fixed window was built on.</p>
   <p>We publish the uncomfortable corollary too: a price-aware day-ahead baseline already captures most of the oracle. Arbitrage alone is not a moat — anyone with published prices can do it. Joule's margin lives where day-ahead scheduling cannot go: cross-day banking, ancillary and capacity stacking, sub-minute response, and settlement-grade evidence.</p>
   <div class="callout">Ancillary and capacity layers — FCR at a measured €141.9k/MW/yr, aFRR at €50.7k/MW/yr, Irish CRM clearing at €135.5k/MW/yr — are inaccessible to any fixed-schedule strategy. Naive capture there is not low. It is zero.</div>
