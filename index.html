@@ -101,13 +101,25 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--signal);outline-off
 @media (prefers-reduced-motion:reduce){.btn .roll span{transition:none}.btn:hover .roll span{transform:none}}
 
 /* hero */
-.hero{min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 0 56px}
+.hero{min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 0 56px;position:relative}
+#hero-fx{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.hero>*:not(#hero-fx){position:relative;z-index:1}
+@media (max-width:900px){
+  .hero{justify-content:flex-start;padding:100px 0 48px}
+  #hero-fx{position:relative;inset:auto;z-index:0;opacity:1;pointer-events:none;
+    height:52vh;min-height:360px;margin:30px 0 20px;order:3}
+  .hero .eyebrow{order:1}
+  .hero h1{order:2}
+  .hero .hero-sub{order:4}
+  .hero .hero-cta{order:5}
+  .hero .hero-meta{order:6}
+}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--signal);margin-bottom:28px;display:flex;align-items:center;gap:12px}
 .eyebrow::before{content:"";width:34px;height:1px;background:var(--signal)}
 h1{font-weight:700;text-transform:uppercase;letter-spacing:-.02em;line-height:.92;
-  font-size:clamp(52px,11.5vw,168px);margin-bottom:34px}
+  font-size:clamp(50px,6.6vw,104px);margin-bottom:34px}
 h1 .l2{color:var(--signal)}
-.hero-sub{max-width:62ch;color:var(--ink-60);font-size:clamp(16px,1.4vw,19px);margin-bottom:44px}
+.hero-sub{max-width:44ch;color:var(--ink-60);font-size:clamp(16px,1.4vw,19px);margin-bottom:44px}
 .hero-cta{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
 .hero-meta{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
   display:flex;gap:48px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-38)}
@@ -215,11 +227,12 @@ footer{padding:64px 0 40px}
 <div class="wrap">
 
   <section class="hero" style="border-bottom:none">
+    <canvas id="hero-fx" aria-hidden="true"></canvas>
     <p class="eyebrow">Flexibility OS for AI factories — Europe</p>
     <h1>Power,<br><span class="l2">negotiated.</span></h1>
     <p class="hero-sub">Every 10 MW of AI load in Europe sits on a grid-revenue pool of €1.0–1.4M a year. Joule unlocks it — by reshaping your compute around the power market, proving every megawatt to the grid, and never touching a single SLA.</p>
     <div class="hero-cta">
-      <a class="btn" href="mailto:hello@joule-os.com?subject=Flexibility%20audit%20request"><span class="roll"><span>Request a flexibility audit<br>Request a flexibility audit</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#C9FE6E" stroke-width="1.4"/></svg></span></a>
+      <a class="btn" href="mailto:hello@joule-os.com?subject=Flexibility-audit-request"><span class="roll"><span>Request a flexibility audit<br>Request a flexibility audit</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#C9FE6E" stroke-width="1.4"/></svg></span></a>
       <a class="btn ghost" href="#numbers"><span class="roll"><span>See the numbers<br>See the numbers</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#0A0A0B" stroke-width="1.4"/></svg></span></a>
     </div>
     <div class="hero-meta">
@@ -372,7 +385,7 @@ footer{padding:64px 0 40px}
   <section class="cta" id="contact">
     <h2 class="rv">What is a megawatt of your load <em>worth?</em></h2>
     <p class="rv">Send us an anonymized load profile. We return a site-specific flexibility assessment — revenue pools by market, compliance gaps, and the full methodology, so your team can verify every number.</p>
-    <a class="btn rv" href="mailto:hello@joule-os.com?subject=Flexibility%20audit%20request"><span class="roll"><span>Request a flexibility audit<br>Request a flexibility audit</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#C9FE6E" stroke-width="1.4"/></svg></span></a>
+    <a class="btn rv" href="mailto:hello@joule-os.com?subject=Flexibility-audit-request"><span class="roll"><span>Request a flexibility audit<br>Request a flexibility audit</span></span><span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H2M9 1V8" stroke="#C9FE6E" stroke-width="1.4"/></svg></span></a>
   </section>
 
 </div>
@@ -395,5 +408,6 @@ footer{padding:64px 0 40px}
 const io = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}})},{threshold:.12});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 </script>
+<script src="hero.js" defer></script>
 </body>
 </html>
