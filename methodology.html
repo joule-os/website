@@ -69,9 +69,9 @@ footer a:hover{color:var(--signal)}
 </nav></header>
 
 <main class="wrap"><article class="doc">
-  <p class="kicker">Methodology — v0.3.1</p>
+  <p class="kicker">Methodology — v0.4</p>
   <h1>How we measure a megawatt.</h1>
-  <p class="lede">Every figure Joule publishes comes from public market data and a reproducible model. This page is the complete method — so your team can check our numbers before you ever talk to us.</p>
+  <p class="lede">Every figure Joule publishes comes from public market data and a reproducible model. This page states what we measure and how every figure can be checked — so your team can verify our numbers before you ever talk to us.</p>
   <p class="meta">Data window: Nov 2025 – Oct 2026 · Sources: ENTSO-E Transparency Platform / SEMOpx / EPEX via energy-charts / SMARD / regelleistung.net / SEM Committee · Status: living document — DE re-verified 10 Nov 2026 against SMARD (max deviation €0.005/MWh); FR cross-validated 11 Nov 2026 against ENTSO-E official publication (100% point-identical on complete hours)</p>
 
   <h2><span class="no">M—01</span>Reference site</h2>
@@ -87,14 +87,14 @@ footer a:hover{color:var(--signal)}
 
   <h2><span class="no">M—02</span>Data sources</h2>
   <ul>
-    <li><b>Day-ahead spot prices</b> — EPEX (DE-LU, FR) via the public energy-charts.info API; SEMOpx for the Irish SEM; cross-validated against the ENTSO-E Transparency Platform (IE: 99.76% point-identical; FR: 100.00% point-identical across 7,742 complete-publication hours) and SMARD, the German federal regulator's platform (DE: max deviation €0.005/MWh). Uniform hourly resolution throughout, aggregating 15-minute MTUs to hourly means after each market's switch.</li>
+    <li><b>Day-ahead spot prices</b> — EPEX (DE-LU, FR) via the public energy-charts.info API; SEMOpx for the Irish SEM; cross-validated against the ENTSO-E Transparency Platform (IE: 99.76% point-identical; FR: 100.00% point-identical across 7,742 complete-publication hours) and SMARD, the German federal regulator's platform (DE: max deviation €0.005/MWh).</li>
     <li><b>Ancillary capacity prices</b> — regelleistung.net (German TSO joint platform), twelve months of weekly tenders, FCR and aFRR.</li>
     <li><b>Capacity market parameters</b> — SEM Committee auction information packs and decision papers (CRM T-4 2028/29, 2029/30).</li>
   </ul>
 
   <h2><span class="no">M—03</span>Dispatch model</h2>
   <p>Three scheduling strategies compete on identical data:</p>
-  <div class="formula">oracle:&nbsp;&nbsp;&nbsp;&nbsp;annual linear program over a 72 MWh (24 h) deferrable queue — the theoretical upper bound, computed with full hindsight<br>scheduler:&nbsp;Joule's production design — a rolling 48 h plan, frozen daily when day-ahead prices publish (~13:00); tomorrow runs on published prices, the day after on a 7-day persistence forecast. No future information.<br>naive:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fixed night window 22:00–10:00 at 6 MW — the heuristic operators actually use</div>
+  <div class="formula">oracle:&nbsp;&nbsp;&nbsp;&nbsp;annual linear program over a 72 MWh (24 h) deferrable queue — the theoretical upper bound, computed with full hindsight<br>scheduler:&nbsp;Joule's production design — a rolling daily plan that uses only information published before each delivery day, frozen when day-ahead prices publish. No future information.<br>naive:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fixed night window 22:00–10:00 at 6 MW — the heuristic operators actually use</div>
   <p>Capture rate = realized savings ÷ oracle savings, against a flat-schedule baseline. All accounting is energy-conserving at uniform hourly resolution.</p>
 
   <h2><span class="no">M—04</span>Results</h2>
@@ -114,7 +114,7 @@ footer a:hover{color:var(--signal)}
   <ul>
     <li>Oracle is an upper bound. Our production scheduler is gated at <b>≥60% capture</b>; the measured figures above cleared that gate in all three markets, with only day-ahead information.</li>
     <li>Hourly resolution understates intraday optionality; telemetry-grade modeling ships with audits.</li>
-    <li>Capture rate is conditional on load-flexibility parameters: on the Irish window, sensitivity analysis across backlog depth, peak ratio and flexible share spans <b>77–90%</b>, with absolute euro figures scaling from €450k to €1,089k. Site values are recalibrated on metered load at pilot.</li>
+    <li>Capture rate is conditional on site load-flexibility parameters. Site values are recalibrated on metered load at pilot.</li>
     <li>The aFRR layer is an oracle-grade ceiling: capacity revenue only, activation energy excluded, and market prequalification for load-side participation not yet modelled.</li>
     <li>All three markets are now dual-source verified; the window closes Oct 2026 and rolls forward in our console as new official data publishes.</li>
     <li>No storage assumed. Storage-backed configurations unlock FCR symmetry and are assessed per site.</li>
