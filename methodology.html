@@ -69,10 +69,10 @@ footer a:hover{color:var(--signal)}
 </nav></header>
 
 <main class="wrap"><article class="doc">
-  <p class="kicker">Methodology — v0.3</p>
+  <p class="kicker">Methodology — v0.3.1</p>
   <h1>How we measure a megawatt.</h1>
   <p class="lede">Every figure Joule publishes comes from public market data and a reproducible model. This page is the complete method — so your team can check our numbers before you ever talk to us.</p>
-  <p class="meta">Data window: Nov 2025 – Oct 2026 · Sources: ENTSO-E Transparency Platform / SEMOpx / EPEX via energy-charts / SMARD / regelleistung.net / SEM Committee · Status: living document — re-verified 10 Nov 2026 (DE cross-validated against SMARD after the 15-minute MTU switch, max deviation €0.005/MWh)</p>
+  <p class="meta">Data window: Nov 2025 – Oct 2026 · Sources: ENTSO-E Transparency Platform / SEMOpx / EPEX via energy-charts / SMARD / regelleistung.net / SEM Committee · Status: living document — DE re-verified 10 Nov 2026 against SMARD (max deviation €0.005/MWh); FR cross-validated 11 Nov 2026 against ENTSO-E official publication (100% point-identical on complete hours)</p>
 
   <h2><span class="no">M—01</span>Reference site</h2>
   <p>All figures refer to a standardized <b>10 MW AI datacenter</b> (IT capacity, meter side scaled by PUE 1.25):</p>
@@ -87,7 +87,7 @@ footer a:hover{color:var(--signal)}
 
   <h2><span class="no">M—02</span>Data sources</h2>
   <ul>
-    <li><b>Day-ahead spot prices</b> — EPEX (DE-LU, FR) via the public energy-charts.info API; SEMOpx for the Irish SEM; cross-validated against the ENTSO-E Transparency Platform (IE: 99.76% point-identical) and SMARD, the German federal regulator's platform (DE: max deviation €0.005/MWh). Uniform hourly resolution throughout, aggregating 15-minute MTUs to hourly means after each market's switch.</li>
+    <li><b>Day-ahead spot prices</b> — EPEX (DE-LU, FR) via the public energy-charts.info API; SEMOpx for the Irish SEM; cross-validated against the ENTSO-E Transparency Platform (IE: 99.76% point-identical; FR: 100.00% point-identical across 7,742 complete-publication hours) and SMARD, the German federal regulator's platform (DE: max deviation €0.005/MWh). Uniform hourly resolution throughout, aggregating 15-minute MTUs to hourly means after each market's switch.</li>
     <li><b>Ancillary capacity prices</b> — regelleistung.net (German TSO joint platform), twelve months of weekly tenders, FCR and aFRR.</li>
     <li><b>Capacity market parameters</b> — SEM Committee auction information packs and decision papers (CRM T-4 2028/29, 2029/30).</li>
   </ul>
@@ -104,7 +104,7 @@ footer a:hover{color:var(--signal)}
     <tr><td>Germany (DE-LU)</td><td>€992k</td><td><span class="sig">86.8%</span></td><td>+2.7%</td></tr>
     <tr><td>France (FR)</td><td>€903k</td><td><span class="sig">85.6%</span></td><td>−3.2%</td></tr>
   </table>
-  <p class="note" style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-38);margin:-18px 0 28px">Data vintage: figures above are computed on the Nov 2025 – Oct 2026 window (IE: one delivery day, 29 Oct 2026, missing from the official publication — dropped and disclosed, not interpolated). An earlier vintage of this table — window Jun 2025 – May 2026: IE €783k / 84.3%, DE €806k / 88.9%, FR €663k / 85.9% — is the basis of our CRU2026143 submission (ref. CRU-C108-2). Windows differ; conclusions do not: all three markets clear our ≥60% acceptance gate. The French row remains single-source (energy-charts / EPEX) pending cross-validation. The naive baseline is computed on UTC hours, matching our console's published configuration.</p>
+  <p class="note" style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-38);margin:-18px 0 28px">Data vintage: figures above are computed on the Nov 2025 – Oct 2026 window (IE: one delivery day, 29 Oct 2026, missing from the official publication — dropped and disclosed, not interpolated). An earlier vintage of this table — window Jun 2025 – May 2026: IE €783k / 84.3%, DE €806k / 88.9%, FR €663k / 85.9% — is the basis of our CRU2026143 submission (ref. CRU-C108-2). Windows differ; conclusions do not: all three markets clear our ≥60% acceptance gate. France cross-validated 11 Nov 2026 against ENTSO-E's official 15-minute publication: 100% point-identical on all complete hours; deviations occur only in hours where the official publication itself is missing 15-minute blocks. The naive baseline is computed on UTC hours, matching our console's published configuration.</p>
   <p>The naive line is not a strawman — it is what a cron job does, and it has quietly become a cost center. Its figure is window-fragile by construction: in Germany it still captured <b>44–46%</b> in the wind season (Nov–Jan) but lost money in six of the twelve months, down to <b>−23%</b> in April; France swings from <b>+38%</b> in January to <b>−27%</b> in April; even in Ireland, the night window's natural habitat, it peaked at <b>+61%</b> in January yet dipped below zero in April and July. Solar has inverted the daily price shape the fixed window was built on.</p>
   <p>We publish the uncomfortable corollary too: a price-aware day-ahead baseline already captures most of the oracle. Arbitrage alone is not a moat — anyone with published prices can do it. Joule's margin lives where day-ahead scheduling cannot go: cross-day banking, ancillary and capacity stacking, sub-minute response, and settlement-grade evidence.</p>
   <div class="callout">Ancillary and capacity layers — FCR at a measured €141.9k/MW/yr, aFRR capacity adding a measured <b>+€297k per 10 MW site per year</b> (+29.9% on top of day-ahead arbitrage, oracle-grade ceiling, capacity revenue only, tenders covered 365/365 days), Irish CRM clearing at €135.5k/MW/yr — are inaccessible to any fixed-schedule strategy. Naive capture there is not low. It is zero.</div>
@@ -116,7 +116,7 @@ footer a:hover{color:var(--signal)}
     <li>Hourly resolution understates intraday optionality; telemetry-grade modeling ships with audits.</li>
     <li>Capture rate is conditional on load-flexibility parameters: on the Irish window, sensitivity analysis across backlog depth, peak ratio and flexible share spans <b>77–90%</b>, with absolute euro figures scaling from €450k to €1,089k. Site values are recalibrated on metered load at pilot.</li>
     <li>The aFRR layer is an oracle-grade ceiling: capacity revenue only, activation energy excluded, and market prequalification for load-side participation not yet modelled.</li>
-    <li>France is single-source (energy-charts / EPEX) pending cross-validation; the window closes Oct 2026 and rolls forward in our console as new official data publishes.</li>
+    <li>All three markets are now dual-source verified; the window closes Oct 2026 and rolls forward in our console as new official data publishes.</li>
     <li>No storage assumed. Storage-backed configurations unlock FCR symmetry and are assessed per site.</li>
   </ul>
   <p style="margin-top:40px">Questions, replication attempts, disputes: <a href="mailto:hello@joule-os.com" style="color:var(--signal);text-decoration:none">hello@joule-os.com</a>. We answer all three.</p>
